@@ -54,9 +54,23 @@ message DeleteUserResponse {
   // Empty response
 };
 
+message ActivateRequest {
+  enum ActivationType {
+    Email = 0;
+  };
+
+  ActivationType type = 1;
+  string code = 2;
+};
+
+message ActivateResponse {
+  // Empty response
+};
+
 service User {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc ActivateUser(ActivateRequest) returns (ActivateResponse);
 };

@@ -27,6 +27,9 @@ message NewMessage {
   // UUID of sender
   string from_user = 4;
 
+  // Destination of the message. User id or Group id.
+  string dest = 7;
+
   // Destination chat id
   // May be direct message or group message.
   string chat_id = 5;
@@ -50,10 +53,13 @@ message NewGroupCreated {
 
 message Notification {
   NotificationType type = 1;
+
   oneof Notification {
     NewMessage message = 2;
     NewGroupCreated group = 3;
   }
+
+  repeated string targets = 4;
 }
 
 message ListenRequest {

@@ -1,0 +1,186 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+
+package groups;
+
+// Скорее всего здесь нужно будет добавить
+// какой-нибудь option для генерации под js
+
+
+/*
+GroupsService обрабатывает создание и управление групповыми чатами.
+
+Группы бывают публичными и приватными.
+Публичные группы:
+- Ищутся в поиске
+- В них можно вступить
+Приватные группы:
+- Только владелец можен добвлять пользователей
+
+Методы разделены на три уровня доступа:
+
+- Создатель - метод доступен только создателю группы
+- Участник - любой пользователь, состоящий в группе
+- Пользователь - любой аутентифицированный пользователь (не обязательно участник)
+ */
+
+
+service Groups {
+
+  // Создает групповой чат
+  // Доступ: пользователь
+  rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
+
+  // Возвращает общую информацию о группе (без участников)
+  // Если группа публичная:
+  //    Доступ: пользователь
+  // Если группа приватная:
+  //    Доступ: участник
+  rpc GetGroup(GetGroupRequest) returns (google.protobuf.Empty) {}
+
+  // Обновляет общую информацию о группе
+  // Доступ: создатель
+  rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {}
+
+  // Ищет группу по имени
+  // Найти по имени можно все публичные группы
+  // и те группы, участником которых является пользователь,
+  // от имени которого выполняется запрос
+  // Доступ: пользователь
+  rpc SearchGroup(SearchGroupRequest) returns (SearchGroupResponse) {}
+
+  // Возвращает группы, в которых состоит текущий пользователь
+  // Доступ: пользователь
+  rpc GetUserGroups(google.protobuf.Empty) returns (GetUserGroupsResponse) {}
+
+  // Добавляет в группу пользователей
+  // Доступ: создатель
+  rpc AddMembers(AddMemberRequest) returns (google.protobuf.Empty) {}
+
+  // Удаляет участников из группы
+  // Доступ: создатель
+  rpc DeleteMembers(DeleteMembersRequest) returns (google.protobuf.Empty) {}
+
+  // Добавляет текущего пользователя в группу
+  // Доступен только если группа публичная.
+  // Доступ: пользователь
+  rpc Join(JoinRequest) returns (google.protobuf.Empty) {}
+
+  // Передает права создателя другому пользователю
+  // Доступ: создатель
+  rpc GiveOwnership(GiveOwnershipRequest) returns (google.protobuf.Empty) {}
+
+  // Текущий пользователь выходит из группы.
+  // Создатель не может выйти из группы
+  // (для начало он должен передать право на владение)
+  // Доступ: участник
+  rpc LeaveGroup(LeaveGroupRequest) returns (google.protobuf.Empty) {}
+
+  // Возвращет список пользователей, состоящих в группе
+  // Доступ: участник
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
+}
+
+message GroupInfo {
+  string group_id = 1;
+  string group_name = 2;
+  string description = 3;
+  string avatar_id = 4;
+  bool is_public = 5;
+  int32 members_count = 6;
+}
+
+message CreateGroupRequest {
+  string group_name = 1;
+  bool is_public = 2;
+  optional string description = 3;
+  optional string avatar_id = 4;
+  // Список идентификаторов пользователей,
+  // которые будут добавлены
+  repeated string members = 5;
+}
+
+message CreateGroupResponse {
+  GroupInfo group = 1;
+}
+
+message GetGroupRequest {
+  // Группа запрашивается по id.
+  // идентификатор группы в формате UUID
+  string group_id = 1;
+}
+
+
+message GetGroupResponse {
+  GroupInfo group = 1;
+}
+
+
+message SearchGroupRequest {
+  // Поиск по имени или его части
+  string group_name = 1;
+}
+
+message SearchGroupResponse {
+  repeated GroupInfo groups = 1;
+}
+
+
+message GetUserGroupsResponse {
+  repeated GroupInfo groups = 1;
+}
+
+message AddMemberRequest {
+  // Добавлять в группу можно кого угодно
+  repeated string user_ids = 1;
+}
+
+message GroupMember {
+  string user_id = 1;
+  bool is_owner = 2;
+}
+
+message DeleteMembersRequest {
+  // Список user_id участников, которых
+  // необходимо удалить
+  repeated string members = 1;
+}
+
+message LeaveGroupRequest {
+  // user_id пользователя, котороый становится
+  // владельцем. Обязан быть членом группы и не может
+  // находиться в списке на удаление (members).
+  optional string give_ownership_to = 2;
+}
+
+message ListMembersRequest {
+  string group_id = 1;
+}
+
+message ListMembersResponse {
+  repeated GroupMember members = 1;
+}
+
+message GiveOwnershipRequest {
+  // id пользователя, которому передаются права владельца.
+  string user_id = 1;
+}
+
+message UpdateGroupRequest {
+  string group_id = 1;
+  optional string group_name = 2;
+  optional string description = 3;
+  optional string avatar_id = 4;
+  optional bool is_public = 5;
+}
+
+message UpdateGroupResponse {
+  GroupInfo group = 1;
+}
+
+message JoinRequest {
+  // Идентификатор группы, в которую нужно вступить.
+  string group_id = 1;
+}

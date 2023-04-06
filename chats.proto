@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package proto;
+
+option go_package = "./internal/pb;pb";
+
+
+message CreateChatRequest {
+  string chat_id = 1;
+  bool is_direct = 2;
+  repeated string members = 3;
+}
+
+message DeleteChatRequest {
+  string chat_id = 1;
+}
+
+message AddChatMembersRequest {
+  string chat_id = 1;
+  repeated string members = 2;
+}
+
+message DeleteChatMembersRequest {
+  string chat_id = 1;
+  repeated string members = 2;
+}
+
+message FileAttachment {
+  string mime_type = 1;
+  string file_id = 2;
+}
+
+
+message SendMessageRequest {
+  string message_id = 1;
+  string chat_id = 2;
+  string text = 3;
+  optional string reply_to = 4;
+  repeated FileAttachment attachments = 5;
+}
+
+message Message {
+  string message_id = 1;
+  string from_user = 2;
+  string chat_id = 3;
+  int64 timestamp = 4;
+  string text = 5;
+  optional string reply_to = 6;
+  repeated FileAttachment attachments = 7;
+}
+
+message GetMessagesSinceRequest {
+  int64 since = 1;
+  int32 count = 2;
+}
+
+message GetMessagesBeforeRequest {
+  int64 before = 1;
+  int32 count = 2;
+}
+
+message GetMessagesResponse {
+  repeated Message messages = 1;
+}
+
+service Chat {
+  rpc CreateChat(CreateChatRequest) returns (google.protobuf.Empty);
+  rpc DeleteChat(DeleteChatRequest) returns (google.protobuf.Empty);
+  rpc AddChatMembers(AddChatMembersRequest) returns (google.protobuf.Empty);
+  rpc DeleteChatMembers(DeleteChatMembersRequest) returns (google.protobuf.Empty);
+
+  rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty);
+  rpc GetMessagesSince(GetMessagesSinceRequest) returns (GetMessagesResponse);
+  rpc GetMessagesBefore(GetMessagesBeforeRequest) returns (GetMessagesResponse);
+  //  rpc UpdateMessage(UpdateMessageRequest) returns (google.protobuf.Empty);
+  //  rpc DeleteMessage(DeleteMessageRequest) returns (google.protobuf.Empty);
+}

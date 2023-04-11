@@ -2,9 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-package proto;
+package chats;
 
-option go_package = "./internal/pb;pb";
+option go_package = "./internal/pb/chats;chats";
 
 
 message CreateChatRequest {

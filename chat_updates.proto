@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package chats.updates;
+
+option go_package = "./internal/pb/chats/updates;updates";
+
+
+message UpdateMeta {
+  // Unix timestamp in UTC timezone
+  int64 timestamp = 2;
+
+  // Array of usernames of users, those should be notified about this update.
+  repeated string audience = 3;
+}
+
+
+message FileAttachment {
+  string mime_type = 1;
+  string file_id = 2;
+}
+
+message MessageSent {
+  string message_id = 1;
+  string from_user = 2;
+  string chat_id = 3;
+  string text = 5;
+  optional string reply_to = 6;
+  repeated FileAttachment attachments = 7;
+}
+
+message ChatCreated {
+  string chat_id = 1;
+  bool is_direct = 2;
+  repeated string members = 3;
+}
+
+message ChatDeleted {
+  string chat_id = 1;
+}
+
+
+message MemberAdded {
+  string chat_id = 1;
+  string username = 2;
+}
+
+message MemberRemoved {
+  string chat_id = 1;
+  string username = 2;
+}
+
+message Update {
+  UpdateMeta meta = 1;
+  oneof update {
+    MessageSent message = 2;
+    ChatCreated created_chat = 3;
+    ChatDeleted deleted_chat = 4;
+    MemberAdded member_added = 5;
+    MemberRemoved member_removed = 6;
+  }
+}

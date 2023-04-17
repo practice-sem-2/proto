@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notifications;
 
-option go_package = "./internal/pb;pb";
+option go_package = "./internal/pb/notify;notify";
 
 enum NotificationType {
   NewMessageNotification = 0;
@@ -11,15 +11,14 @@ enum NotificationType {
 message Attachment {
   string file_id = 1;
   string mime_type = 2;
-  int64 size_in_bytes = 3;
 }
 
 message NewMessage {
   // UUID of message
   string message_id = 1;
 
-  // Timestamp in RFC 3339 format
-  string created_at = 2;
+  // Timestamp in UTC
+  int64 created_at = 2;
 
   // Text of the message
   string text = 3;
@@ -27,12 +26,12 @@ message NewMessage {
   // UUID of sender
   string from_user = 4;
 
-  // Destination of the message. User id or Group id.
-  string dest = 7;
-
   // Destination chat id
   // May be direct message or group message.
   string chat_id = 5;
+
+  // UUID of message
+  optional string reply_to = 7;
 
   repeated Attachment attachments = 6;
 }
@@ -52,14 +51,10 @@ message NewGroupCreated {
 }
 
 message Notification {
-  NotificationType type = 1;
-
   oneof Notification {
     NewMessage message = 2;
     NewGroupCreated group = 3;
   }
-
-  repeated string targets = 4;
 }
 
 message ListenRequest {

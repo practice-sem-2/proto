@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package notifications;
+
+option go_package = "./internal/pb/notify;notify";
+
+enum NotificationType {
+  NewMessageNotification = 0;
+}
+
+message Attachment {
+  string file_id = 1;
+  string mime_type = 2;
+}
+
+message NewMessage {
+  // UUID of message
+  string message_id = 1;
+
+  // Timestamp in UTC
+  int64 created_at = 2;
+
+  // Text of the message
+  string text = 3;
+
+  // UUID of sender
+  string from_user = 4;
+
+  // Destination chat id
+  // May be direct message or group message.
+  string chat_id = 5;
+
+  // UUID of message
+  optional string reply_to = 7;
+
+  repeated Attachment attachments = 6;
+}
+
+message NewGroupCreated {
+  // UUID of created group
+  string group_id = 1;
+
+  string group_name = 2;
+  optional string group_avatar = 3;
+
+  // UUID of chat assigned to a group
+  string chat_id = 4;
+
+  // Timestamp of group creation in RFC 3339 format
+  string created_at = 5;
+}
+
+message Notification {
+  oneof Notification {
+    NewMessage message = 2;
+    NewGroupCreated group = 3;
+  }
+}
+
+message ListenRequest {
+  // Empty request
+}
+
+service Notifications {
+  // Authentication required
+  rpc Listen(ListenRequest) returns (stream Notification);
+}

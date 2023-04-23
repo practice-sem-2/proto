@@ -51,29 +51,49 @@ message Message {
   repeated FileAttachment attachments = 7;
 }
 
-message GetMessagesSinceRequest {
-  int64 since = 1;
-  int32 count = 2;
+message GetMessagesRequest {
+  string chat_id = 1;
+  optional int64 since = 2;
+  optional int64 until = 3;
+  optional int32 count = 4;
 }
 
-message GetMessagesBeforeRequest {
-  int64 before = 1;
-  int32 count = 2;
+message RichChat {
+  string chat_id = 1;
+  bool is_direct = 2;
+  Message last_message = 3;
+}
+
+message GetChatsRequest {
+  string username = 1;
+}
+
+message GetChatsResponse {
+  repeated RichChat chats = 1;
 }
 
 message GetMessagesResponse {
   repeated Message messages = 1;
 }
 
+message GetChatRequest {
+  string chat_id = 1;
+}
+
+message GetChatResponse {
+  string chat_id = 1;
+  int32 members_count = 2;
+  repeated string members = 3;
+}
+
 service Chat {
   rpc CreateChat(CreateChatRequest) returns (google.protobuf.Empty);
   rpc DeleteChat(DeleteChatRequest) returns (google.protobuf.Empty);
+  rpc GetChat(GetChatRequest) returns (GetChatResponse);
   rpc AddChatMembers(AddChatMembersRequest) returns (google.protobuf.Empty);
   rpc DeleteChatMembers(DeleteChatMembersRequest) returns (google.protobuf.Empty);
+  rpc GetUserChats(GetChatsRequest) returns (GetChatsResponse);
 
   rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty);
-  rpc GetMessagesSince(GetMessagesSinceRequest) returns (GetMessagesResponse);
-  rpc GetMessagesBefore(GetMessagesBeforeRequest) returns (GetMessagesResponse);
-  //  rpc UpdateMessage(UpdateMessageRequest) returns (google.protobuf.Empty);
-  //  rpc DeleteMessage(DeleteMessageRequest) returns (google.protobuf.Empty);
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
 }

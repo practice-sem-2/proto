@@ -65,7 +65,7 @@ message RichChat {
 }
 
 message GetChatsRequest {
-  string username = 1;
+  // Empty request
 }
 
 message GetChatsResponse {

@@ -35,6 +35,15 @@ message GetUserResponse {
   UserData user = 1;
 };
 
+message GetManyUsersRequest {
+  repeated string usernames = 1;
+}
+
+message GetManyUsersResponse {
+  repeated UserData users = 1;
+  repeated string missing = 2;
+}
+
 message UpdateUserRequest {
   string username = 1;
   optional string first_name = 2;
@@ -55,11 +64,7 @@ message DeleteUserResponse {
 };
 
 message ActivateRequest {
-  enum ActivationType {
-    Email = 0;
-  };
-
-  ActivationType type = 1;
+  string username = 1;
   string code = 2;
 };
 
@@ -75,6 +80,7 @@ message GetUserByCredentialsRequest {
 service User {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetManyUsers(GetManyUsersRequest) returns (GetManyUsersResponse);
   rpc GetUserByCredentials(GetUserByCredentialsRequest) returns (GetUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
